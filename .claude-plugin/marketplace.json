@@ -1,0 +1,15 @@
+{
+  "name": "ferrislabs-skills",
+  "owner": {
+    "name": "Ferrislabs",
+    "url": "https://github.com/ferrislabs"
+  },
+  "description": "Engineering skills published by Ferrislabs.",
+  "plugins": [
+    {
+      "name": "ferrislabs",
+      "source": "./",
+      "description": "Rust, spec-driven development, testing and git-writing skills, with always-on neurodivergent-friendly output."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "ferrislabs",
+  "description": "Ferrislabs toolbox: Rust patterns, spec-driven development, testing (unit, integration, Gherkin, simulation), git writing. Always-on ADHD/autism-friendly output.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Ferrislabs",
+    "url": "https://github.com/ferrislabs"
+  }
+}
