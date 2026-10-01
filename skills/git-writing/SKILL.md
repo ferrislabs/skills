@@ -1,6 +1,6 @@
 ---
 name: git-writing
-description: Writes commits, pull requests, issues and review replies that read as written by a human maintainer - short, factual, no AI tells - by combining the i-have-adhd rules with the humanizer skill. Consult whenever drafting or editing a commit message, PR title or description, issue, changelog entry, or review comment, and before opening any of them.
+description: Writes commits, pull requests, issues and review replies that read as written by a human maintainer - short, factual, no AI tells - by combining the i-have-adhd rules with the humanizer skill. Sets labels, assignee and the linked issue at creation, and caps body length. Consult whenever drafting or editing a commit message, PR title or description, issue, changelog entry, or review comment, and before opening any of them.
 ---
 
 # Git writing
@@ -24,25 +24,51 @@ Format: `<type>(<scope>): <imperative lowercase verb> <rest>`
 
 No footer, no "Generated with" line, no mention of Claude or AI.
 
-Write in this order, as plain paragraphs:
+### Opens complete
 
-1. What changes and why (2 to 4 sentences).
-2. What the reviewer must know that the diff does not show: rejected alternatives, what was measured, what is deferred.
-3. What was verified, as a result: `nextest: 412 passed, 0 failed`. What was not verified, in one sentence.
-4. Link: `Closes #N` or `Refs #N`. If no issue exists, say so.
+The creation command fills the panel. Nothing is left to click afterwards.
 
-Rules:
+```
+gh pr create --title "<type>(<scope>): <summary>" \
+  --body-file body.md --assignee @me --label <label-from-gh-label-list>
+```
 
-- Opens complete: reviewers, assignee, labels set in the creation command. Labels only from the existing set. Never guess a reviewer.
-- The description is part of the diff. Before pushing to an open PR, re-read it. Rewrite it if a commit made it false.
-- The diff is the ceiling. Extra findings go in an issue, linked.
-- Paste a result, not a transcript.
-- For Rust PRs: name any `dyn`, `async-trait`, or new dependency and give the reason in one line.
+Shape only. Every value is chosen per change; none of them is a default.
+
+- Labels: run `gh label list` first, pick what fits this change. Zero or several is fine. Nothing fits: open without one and say which label is missing. Never carry a label over from a previous PR or from this example.
+- Assignee: `@me`, unless the user named someone.
+- Linked issue: `Closes #N` as the last line of the body. That is what fills the Development panel.
+- Reviewers: only when the repo makes the person obvious (CODEOWNERS, or whoever last reviewed this area). Never guess.
+- Projects, milestone: left empty unless the user asks.
+
+After opening, check: `gh pr view <N> --json labels,assignees,closingIssuesReferences`. A field empty that should be set is fixed before the user is told the PR exists.
+
+### Body
+
+The reader has ADHD and was not in the session. Hard cap: 10 lines of text. Blank lines and the `Closes #N` line do not count. Plain lines, no headings, no bold used as a heading, no list over 5 items.
+
+What goes in, in this order:
+
+1. What was broken or missing, and what the change does. 2 sentences.
+2. What the diff does not show: a rejected alternative, a measured number, something deferred. One line each, 3 lines max.
+3. Verification as a result, one line: `2153 passed, 0 failed`. What was not verified goes on the same line.
+4. `Closes #N` or `Refs #N`. If no issue exists, say so in one line.
+
+What never goes in: the reasoning trail, the file-by-file tour, the call-site inventory, the paragraph justifying a signature change, the explanation of why a sibling file was left alone. A reviewer who needs that gets it as a comment on the line it concerns, or in the ADR.
+
+For Rust PRs: name any `dyn`, `async-trait` or new dependency and give the reason in one line, inside the 10.
+
+Test before posting: the description fits on a laptop screen with no scroll. Over the cap means cut, not reformat.
+
+The description is part of the diff. Before pushing to an open PR, re-read it. Rewrite it if a commit made it false.
+
+The diff is the ceiling. Extra findings go in an issue, linked. Paste a result, not a transcript.
 
 ## Issues
 
 - Title: the problem, not the solution. Under 70 characters.
-- Body: what is broken or missing, where (file, version, command), how to reproduce, expected versus actual. Proposed fix last, if any.
+- Opens complete: labels and assignee set in `gh issue create`, same rules as a PR.
+- Body cap: 8 lines of text. What is broken or missing, where (file, version, command), how to reproduce, expected versus actual. Proposed fix last, one line, only if you have one.
 - One problem per issue.
 
 ## Review replies
@@ -65,8 +91,10 @@ Rules:
 
 ## Process
 
-1. Draft with the rules above. No headings if under one page.
-2. If longer than a few paragraphs, run the `humanizer` skill on the draft. Tell it: facts are frozen (SHAs, numbers, paths, versions, link targets do not change).
-3. Read the three latest comments a human maintainer wrote in this repo. Match their length and register.
-4. Final check as the reader: do they know what changed, why, how it was checked, and what to do?
-5. Outward-facing: show the user the draft in French summary + English text. Post only when they agree, unless the repo preferences already authorize it.
+1. Draft with the rules above.
+2. Count the lines. Over the cap: cut content, do not compress wording.
+3. Run the `humanizer` skill on the draft. Tell it: facts are frozen (SHAs, numbers, paths, versions, link targets do not change).
+4. Read the three latest comments a human maintainer wrote in this repo. Match their length and register.
+5. Final check as the reader: do they know what changed, why, how it was checked, and what to do?
+6. Outward-facing: show the user the draft in French summary + English text. Post only when they agree, unless the repo preferences already authorize it.
+7. After opening, verify labels, assignee and the linked issue landed.
