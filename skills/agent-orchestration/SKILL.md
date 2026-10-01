@@ -54,7 +54,7 @@ Launched by `/ferrislabs:work-issues [label]` or headless (below). Per issue:
 7. **Decompose and dispatch.** Freeze contracts. Partition files. Route per the table. One message per wave.
 8. **Integrate.** Read each diff. Re-run each workstream's verification. Convergence points (mod registration, `Cargo.toml`, migrations) belong to the orchestrator.
 9. **Exit.** Full `Verify (exit)` once. Review lenses in parallel (L only).
-10. **PR.** Via `git-writing`. `Closes #N`. Reviewers/labels from config. **Never merge.**
+10. **PR.** Via `git-writing`: body under the cap, `Closes #N` last line, assignee and labels set in `gh pr create`, reviewers from config. Verify with `gh pr view <N> --json labels,assignees,closingIssuesReferences` before reporting. **Never merge.**
 11. **Report.** One comment on the issue: PR link, what was verified, what was not. Remove the claim.
 12. **Next issue**, until the queue is empty or a stop condition hits.
 
@@ -99,7 +99,8 @@ Sub-agents may not see the always-on rules. Paste these lines into each briefing
 
 ```
 Output rules: report in terse structured form. No preamble, no recap.
-Code rules: no comments of any kind. No async-trait. Static dispatch first, enum second, dyn only if the briefing allows it. Borrow instead of clone.
+Comments in code: none. Only an explicit line below overrides this one.
+Code rules: no async-trait. Static dispatch first, enum second, dyn only if the briefing allows it. Borrow instead of clone.
 Scope: write only the files listed under Scope. Anything else: stop and report.
 ```
 

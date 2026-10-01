@@ -20,7 +20,7 @@ Default state of a file: no comments. The code says what. The commit, PR or ADR 
    - `// SAFETY: <reason>` when `clippy::undocumented_unsafe_blocks` is on.
    - `///` one line on public items when `missing_docs` is on.
    - `// TODO(#123): <what>` with an issue number.
-7. A user request for a comment is the only other exception. Difficulty of the code is not a request.
+7. Ask once per session, at the first task that writes code: `Commentaires dans le code ou pas ?` One closed line, before writing. The answer holds for the whole session, every file, every sub-agent. No answer, or no occasion to ask: zero comments. Difficulty of the code is not a request.
 8. The why goes to: commit message, PR description, ADR.
 
 ## Dependency direction

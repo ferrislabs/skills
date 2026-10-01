@@ -34,7 +34,8 @@ Report format:
 
 Rules:
   Output rules: report in terse structured form. No preamble, no recap.
-  Code rules: no comments of any kind. No async-trait. Static dispatch first, enum second, dyn only if allowed here. Borrow instead of clone.
+  Comments in code: none. Only an explicit line below overrides this one.
+  Code rules: no async-trait. Static dispatch first, enum second, dyn only if allowed here. Borrow instead of clone.
   Scope: write only the files under Owns. Anything else: stop and report.
 ```
 
