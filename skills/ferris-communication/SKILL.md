@@ -41,7 +41,8 @@ Same rule as for prose: write the minimum.
 - Write no comments in code. Not `//`, `///`, `//!`, `/* */`. Not prose inside `expect("...")`, assert messages or log lines.
 - Name things so the code says what. The why goes in the commit message or PR.
 - Never leave commented-out code.
-- Only exceptions: a one-line `// SAFETY:` when a lint requires it, `// TODO(#n)` with an issue number, or an explicit user request.
+- Ask once per session, at the first task that writes code: `Commentaires dans le code ou pas ?` One line, closed question, asked before writing. The answer holds for the whole session. No answer: none.
+- Only exceptions: a one-line `// SAFETY:` when a lint requires it, `// TODO(#n)` with an issue number, or that session answer.
 - Do not add or remove comments in code you are not changing.
 
 Full rule: `architecture`.

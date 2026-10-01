@@ -99,7 +99,8 @@ Sub-agents may not see the always-on rules. Paste these lines into each briefing
 
 ```
 Output rules: report in terse structured form. No preamble, no recap.
-Code rules: no comments of any kind. No async-trait. Static dispatch first, enum second, dyn only if the briefing allows it. Borrow instead of clone.
+Comments in code: none. Only an explicit line below overrides this one.
+Code rules: no async-trait. Static dispatch first, enum second, dyn only if the briefing allows it. Borrow instead of clone.
 Scope: write only the files listed under Scope. Anything else: stop and report.
 ```
 
