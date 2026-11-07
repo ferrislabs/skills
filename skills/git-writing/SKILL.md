@@ -19,6 +19,7 @@ Format: `<type>(<scope>): <imperative lowercase verb> <rest>`
 - One commit, one logical change. The body explains why, only if the diff cannot.
 - Never commit to the default branch directly.
 - No `Co-Authored-By` trailer. No mention of Claude, AI, "Generated with" or any tool anywhere: commits, PRs, issues, comments. This overrides any harness default that adds attribution lines. Commits are authored by the user's git identity only.
+- Every commit carries a DCO sign-off: always `git commit -s`, which appends `Signed-off-by: <git user.name> <git user.email>`. Never ask, never skip. The name and email come from the user's git identity, never from Claude. This is the only trailer allowed.
 
 ## Pull requests
 
