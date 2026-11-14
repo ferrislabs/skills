@@ -54,4 +54,4 @@ Per-repo config: `.claude/ferris.local.md` (template in `skills/agent-orchestrat
 ## Vendored code
 
 `skills/i-have-adhd/` is a copy of upstream with two edits: frontmatter (no `disable-model-invocation`, new description) and the Persistence section (no off switch). License: `skills/i-have-adhd/LICENSE`.
-`skills/dev-methodology/references/orchestration.md` is copied from LeadcodeDev/skills.
+`skills/dev-methodology/references/orchestration.md` is copied from LeadcodeDev/skills, then split: L-only sections moved to `orchestration-l.md`.

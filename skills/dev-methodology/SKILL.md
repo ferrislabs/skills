@@ -23,7 +23,7 @@ Default to Iteration once a spec exists. A second spec in one session is almost 
 |------|------------|---------|
 | **S** | ≤ 3 files, no contract change, cause and fix clear | Regression test + fix on a branch. No spec. |
 | **M** | One coherent feature or fix, one PR | Spec via `spec-driven` (short form) + TDD. |
-| **L** | Several independently reviewable sub-features | Spec (full form) → decompose → sub-agents. Read `references/orchestration.md` first. |
+| **L** | Several independently reviewable sub-features | Spec (full form) → decompose → sub-agents. Read `references/orchestration.md` and `references/orchestration-l.md` first. |
 
 In doubt between two sizes that both qualify: pick the smaller and say so. Grown mid-flight: escalate explicitly.
 
@@ -59,7 +59,7 @@ All items asked are delivered and verified. If one is blocked, finish the others
 - **Scope the loop, not the exit.** In-loop: `cargo test -p <crate> <module>::`. Exit block runs once, named `Verify (exit)` in the spec.
 - **Independent checks run together.** Exception: cargo locks the target dir, so `clippy` and `test` in one checkout serialize anyway.
 - **Cheap models for bounded work.** Main session keeps decisions and integration. Implementation goes to `sonnet`, search and mechanical edits to `haiku`. Routing, issue loop and limits: `agent-orchestration`. Structure and comments: `architecture`.
-- **Sub-agents, never git worktrees.** Parallel writes are made safe by file partitioning, not workspace duplication. Never two writers on one file. L work follows `references/orchestration.md`.
+- **Sub-agents, never git worktrees.** Parallel writes are made safe by file partitioning, not workspace duplication. Never two writers on one file. L work follows `references/orchestration.md` and `references/orchestration-l.md`.
 - **Read before you write.** Read the files you touch, the full ticket, the full error. Search prior art first.
 - **Short loops.** Write, compile, test. No large batches of unverified code.
 - **Deletion beats addition.** Do not abstract before the third occurrence. A shallow wrapper is worse than none.

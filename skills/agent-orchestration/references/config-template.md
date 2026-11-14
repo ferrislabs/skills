@@ -41,7 +41,22 @@ verify-exit: |
   cargo fmt --check
   cargo clippy --workspace --all-targets -- -D warnings
   cargo nextest run --workspace
+
+verify-loop: |                   # in-loop, scoped to the crate under change
+  cargo check -p <crate> --all-targets
+  cargo nextest run -p <crate> <module>::
+
+env:                             # cuts rebuild cost, same checks as verify-exit
+  RUSTC_WRAPPER: sccache         # shared compile cache across agents and runs
+  CARGO_HOME: ~/.cargo           # one registry and download cache for everyone
+  CARGO_TARGET_DIR: target/<agent>  # one dir per concurrent agent, cargo locks the dir
 ```
+
+Rules for the block above:
+
+- `verify-loop` never replaces `verify-exit`. The exit block still runs once, on the integrated tree.
+- Sequential agents share `target/`, so the cache stays warm. Give a separate `CARGO_TARGET_DIR` only to agents running concurrently.
+- Keep `sccache` only if it is installed (`command -v sccache`); otherwise drop the line.
 
 ## Kickoff questions (one batch, when the file is missing)
 

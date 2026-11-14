@@ -1,6 +1,6 @@
 # Sub-Agent Orchestration
 
-Load this file once per session: before decomposing an L feature, and in any case before its first sub-agent dispatch. Re-read it if it was edited since, or if context was compacted and you cannot tell whether it is still in play. Not for S/M work, and not for a single delegated lookup — those are scheduling, not orchestration, and the rules they need are inline in `SKILL.md`. Use `superpowers:subagent-driven-development` when available as the execution protocol (task sequencing, checkpoints); the rules below govern what every dispatch must contain and how results are accepted — they apply on top of it, or standalone when superpowers is absent.
+Load this file once per session, before the first sub-agent dispatch. For L work also read `orchestration-l.md` before decomposing. Re-read it if it was edited since, or if context was compacted and you cannot tell whether it is still in play. Not for work done inline, and not for a single delegated lookup — those are scheduling, not orchestration, and the rules they need are inline in `SKILL.md`. Use `superpowers:subagent-driven-development` when available as the execution protocol (task sequencing, checkpoints); the rules below govern what every dispatch must contain and how results are accepted — they apply on top of it, or standalone when superpowers is absent.
 
 The single most common orchestration failure is the orchestrator assuming a sub-agent "knows" something it never wrote down. A sub-agent wakes up with zero conversation context: it has not seen the user's messages, the decisions made, or the dead ends already explored. Everything it needs must be in the briefing.
 
@@ -29,52 +29,16 @@ A file partition is written before anyone has read the code deeply enough to enu
 
 **These are orchestrator-owned. No sub-agent writes them.** A sub-agent needing a line added there reports the exact line; the orchestrator applies all of them at integration, in one pass, in a known order. This is what keeps two genuinely independent workstreams parallel when their only conflict is one registration line each — merging them to avoid a two-line edit trades real concurrency for nothing.
 
-### Generated artifacts are not convergence points
+### Generated artifacts
 
-A file that a command can reproduce from other files is not something to partition, hand-edit, or merge. It is something to **regenerate**.
+A file a command can rebuild (lockfiles, generated clients, schema caches) is never partitioned, hand-edited or merged. Nobody touches it; the orchestrator regenerates it once from the integrated state. Detail and failure modes: `orchestration-l.md`.
 
-The test is one question: *can this file be rebuilt by running something?* Generated API clients, schema caches, lockfiles, derived type definitions, compiled assets — if yes, no sub-agent touches it, and neither does the orchestrator by hand. Regenerate it from the integrated state, once, after each integration.
 
-The two species sit side by side and are easy to confuse. `Cargo.toml` is hand-written, so a sub-agent reports the line it needs; `Cargo.lock` is derived, so nobody reports anything and the orchestrator rebuilds it. Applying the reporting rule to a generated file produces nonsense the moment the file is large: asking three sub-agents to report "the exact line" they need in a thousand-line generated client is a request none of them can honestly answer.
-
-Two failure modes make this worth a rule rather than a habit:
-
-- **Concurrent regeneration silently produces a wrong file.** Each agent regenerates from its own partial state, so each output is correct for one workstream and missing the others. The last write wins, the result compiles, and nothing announces that two workstreams' worth of definitions just vanished.
-- **Generated diffs bury the reviewed change.** A regenerated client can move a thousand lines beside twenty lines of actual work. A pull request that cannot be read is not reviewed, whatever its approval says.
-
-Declare these in the workstream state artifact as a third category, next to the owned files and the orchestrator-owned list: **regenerated at integration**, with the exact command that rebuilds each one.
-
-Record the partition — owned files per workstream, plus the orchestrator-owned list — in the workstream state artifact, beside the frozen contracts. It is the single source of truth for who writes what.
+Record the partition — owned files per workstream, plus the orchestrator-owned list — in the workstream state artifact (L: `orchestration-l.md`), beside the frozen contracts. It is the single source of truth for who writes what.
 
 **Out-of-scope discovery.** A sub-agent that finds it needs to write a file it does not own stops and reports. It does not write it, and it does not widen its own scope. The orchestrator then decides: hand the file over, add it to the orchestrator-owned set, or merge the workstreams. Silent scope widening is how a partition becomes fiction.
 
 **Cheap detection.** Every report lists the files it changed — already required by the report format. Diff those lists against the declared partition when each report lands, not at integration. An overlap caught on arrival costs a re-dispatch; the same overlap caught at integration costs a conflict resolution on merged work.
-
-## Raising the parallelism ceiling
-
-Parallelism is capped by three separate things: how the work decomposes, how it is scheduled, and what the toolchain permits. A decomposition that only attacks the first leaves the other two on the table.
-
-### Schedule as a pipeline, not a barrier
-
-Do not wait for every workstream to finish stage N before starting stage N+1. Each flows through its own chain independently, so wall-clock becomes the slowest single chain rather than the sum of per-stage maxima. If the slowest workstream takes three times the fastest, a barrier discards two thirds of the fast ones' time.
-
-A barrier is correct only when the next stage genuinely needs the whole previous set at once — deduplicating across all findings, or exiting early because the total came back empty. "I need to flatten the results first" is not a barrier: do the transform inside the chain.
-
-### Remove toolchain contention before blaming the decomposition
-
-A perfect file partition buys nothing if the tooling serializes anyway. Check this before concluding that work is not parallelizable:
-
-- `cargo` holds a lock on the target directory — concurrent builds in one checkout block at the toolchain level, however well the sources are partitioned. Give each agent its own `CARGO_TARGET_DIR`, or keep builds off the concurrent path.
-- A shared test database serializes integration tests. Give each agent its own database name or schema.
-- Fixed ports collide. Allocate them dynamically.
-
-This creates no new parallelism; it stops discarding the parallelism the decomposition already earned. One-time infrastructure work that pays on every subsequent L feature.
-
-### Parallelize the exit, not just the entrance
-
-Implementation is often legitimately serial. Verification never is — once a workstream is integrated, its checks are mutually independent and read-only, so they carry no conflict risk at all. Judgment checks run as one sub-agent per lens: correctness, security, performance, conformance to the mini-spec. One lens per agent beats one agent asked to check everything — a brief carrying a single question produces a sharper answer than a checklist.
-
-Mechanical checks (typecheck, lint, tests) are batched commands rather than sub-agents; see "Testing and verification" in the core methodology, and mind the toolchain contention above.
 
 ## The dispatch batch
 
@@ -125,19 +89,3 @@ A sub-agent's claim is not evidence.
 - If a report shows deviations from the spec, decide explicitly: accept and record why in the decision log, or re-dispatch with a corrected briefing. Prefer **continuing the same sub-agent** with the correction — it already holds the context — over briefing a fresh one from scratch.
 - For critical or surprising findings, verify adversarially: dispatch an independent sub-agent whose brief is to *refute* the finding, not confirm it. A finding that survives a motivated skeptic is worth trusting.
 
-## The completeness pass
-
-Before declaring an L feature integrated, run one final check — yourself or a dedicated sub-agent — asking only: *what is missing?* Verifications never run, workstreams marked done but never re-tested after a sibling merged, acceptance criteria from the mini-spec nobody checked. What it finds becomes the next round of work, not a footnote.
-
-## Workstream state (survives sessions and context compaction)
-
-For any L feature, maintain one tracking artifact — the parent chantier issue body (preferred when issues were opted in at kickoff) or `docs/chantiers/<name>.md`:
-
-- The decomposition: workstream list with one-line missions, and what each depends on.
-- Status per workstream: pending / in-flight / integrated.
-- Frozen contracts, verbatim.
-- The file partition, in three categories: files owned per workstream, orchestrator-owned convergence points, and artifacts regenerated at integration with the command that rebuilds each.
-- Per-workstream environment where the toolchain would otherwise serialize: database name, build directory, port range.
-- Decision log: non-obvious choices with the rejected alternative.
-
-Update it at every integration, not at the end. This artifact is what makes the orchestration resumable by a future session with zero shared memory — write it for that reader.

@@ -1,6 +1,6 @@
 ---
 name: git-writing
-description: Writes commits, pull requests, issues and review replies that read as written by a human maintainer - short, factual, no AI tells - by combining the i-have-adhd rules with the humanizer skill. Sets labels, assignee and the linked issue at creation, and caps body length. Consult whenever drafting or editing a commit message, PR title or description, issue, changelog entry, or review comment, and before opening any of them.
+description: Writes commits, pull requests, issues and review replies that read as written by a human maintainer - short, factual, no AI tells - by combining the i-have-adhd rules with the humanizer skill. Sets labels, assignee and the linked issue at creation, and caps body length. Consult whenever drafting or editing a commit message, PR title or description, issue, changelog entry, or review comment, and before opening any of them. Also covers stacking PRs when a chantier spans several.
 ---
 
 # Git writing
@@ -64,6 +64,23 @@ Test before posting: the description fits on a laptop screen with no scroll. Ove
 The description is part of the diff. Before pushing to an open PR, re-read it. Rewrite it if a commit made it false.
 
 The diff is the ceiling. Extra findings go in an issue, linked. Paste a result, not a transcript.
+
+### Stacked PRs
+
+A chantier split into several PRs is stacked when a PR needs code from another PR of the same chantier that is not merged yet. Independent PRs are not stacked: they target the default branch.
+
+Stack only if the forge allows a PR to target a non-default branch. GitHub and GitLab do. Check with the CLI: `gh pr create --help` or `glab mr create --help`. If the tool or the repo does not allow it, open the next PR after its parent merges and say why.
+
+- Branch the child from the parent's branch, not from the default branch.
+- Target the parent: `gh pr create --base <parent-branch> ...`, or `glab mr create --target-branch <parent-branch> ...`.
+- First line of the body: `Stacked on #<parent>, merge after it.` It does not count toward the 10 lines, like `Closes #N`.
+- One PR per layer, each reviewable alone. A layer's diff holds only its own change: if the review diff shows the parent's commits, the base is wrong.
+- Keep the stack shallow: 3 open layers at most. Past that, wait for a merge before opening the next.
+- `Closes #N` goes on the layer that completes the issue. It takes effect when that PR reaches the default branch. Lower layers use `Refs #N`.
+- Merge bottom first. Merging is human-only, as everywhere.
+- After a parent merges, check the child now targets the default branch: `gh pr view <N> --json baseRefName`. If not, retarget it (`gh pr edit <N> --base <default>`).
+- Update a child after its parent changed by merging the parent branch into it. Rebasing means a force-push: only with the user's explicit go, `--force-with-lease` on that branch alone.
+- Verify at creation: `gh pr view <N> --json baseRefName,labels,assignees`. A base that is not the parent is fixed before reporting.
 
 ## Issues
 
