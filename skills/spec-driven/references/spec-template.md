@@ -1,6 +1,6 @@
 # Spec templates
 
-Location: the PR description for M. `docs/specs/<name>.md` for L (also the workstream state artifact, see `dev-methodology/references/orchestration.md`).
+Location: the PR description for M. `docs/specs/<name>.md` for L (also the workstream state artifact, see `dev-methodology/references/orchestration-l.md`).
 
 ## Mini-spec (M)
 

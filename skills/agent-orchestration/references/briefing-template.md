@@ -1,6 +1,6 @@
 # Briefing and report templates
 
-A sub-agent starts with zero context. Everything it needs is in the briefing. Six sections, always.
+A sub-agent starts with zero context. Everything it needs is in the briefing. Six sections, always. Its standing rules (terse report, no comments, dispatch order, scope) come from its agent file: do not repeat them.
 
 ## Briefing
 
@@ -26,17 +26,10 @@ Verification:
   Regime: <sequential = run full exit block | concurrent = stay scoped>
 
 Report format:
-  files_changed: [...]
-  commands_run: [{cmd, result}]   # actual output, one line each
-  deviations: [...]
-  open_questions: [...]
-  Terse. No preamble, no recap.
+  default from the agent file; write one here only to override.
 
-Rules:
-  Output rules: report in terse structured form. No preamble, no recap.
-  Comments in code: none. Only an explicit line below overrides this one.
-  Code rules: no async-trait. Static dispatch first, enum second, dyn only if allowed here. Borrow instead of clone.
-  Scope: write only the files under Owns. Anything else: stop and report.
+Overrides:
+  <only lines that change an agent default, e.g. "comments in code: wanted". Omit the section otherwise.>
 ```
 
 ## Scout briefing (haiku)
@@ -56,7 +49,6 @@ Example before/after: <snippet>
 Owns: <files>
 Verification: <command>
 Report: files changed, command output.
-Rules: no comments, do not touch anything else.
 ```
 
 ## Reviewer briefing (sonnet)
